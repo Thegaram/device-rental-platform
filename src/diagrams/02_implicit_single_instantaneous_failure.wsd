@@ -1,0 +1,31 @@
+title implicit_single_instantaneous_failure
+
+participant device_registry
+participant client
+participant contract
+participant device
+
+client->+device_registry: request device descriptor
+note left of device_registry: contract address,\nservices, etc.
+device_registry-->-client: device descriptor
+
+client->+contract: request
+note right of contract: validate\nrequest...
+contract-->-client: confirmation\n(request id)
+
+client->+device: connect, send request id
+note right of device: validate\nrequest...
+
+device->+contract: execute
+contract-->-device: confirmation
+
+note right of device: failure!
+
+device->+contract: execution_failed
+contract-->-device: confirmation
+
+device-->-client: signal failure
+
+client->+contract: cancel
+note right of contract: validate\nrequest...
+contract-->-client: confirmation\nreimbursement

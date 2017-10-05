@@ -1,0 +1,42 @@
+title Client request
+
+participant user_code
+participant device
+participant client
+participant contracts_service
+participant eth_node
+participant contract
+
+device->device: listen for ws connections
+
+client->+contracts_service: request metadata
+note right of contracts_service: contract address,\nservices, etc.
+contracts_service-->-client:
+
+client->client: create transfer tx
+client->eth_node: send tx
+note right of eth_node: mining...
+
+client->eth_node: poll tx...
+client->eth_node: poll tx...
+eth_node-->contract: receive funds
+client->eth_node: poll tx...
+eth_node-->client: tx receipt or error
+
+client->device: establish connection (ws)
+client->device: send request
+
+device->device: data lookup
+
+device->device: create charge tx
+device->eth_node: send tx
+note right of eth_node: mining...
+
+device->eth_node: poll tx...
+device->eth_node: poll tx...
+eth_node-->contract: receive funds
+device->eth_node: poll tx...
+eth_node-->device: tx receipt or error
+
+device->user_code: perform action
+user_code-->client: return data (optional)

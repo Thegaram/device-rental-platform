@@ -1,0 +1,61 @@
+digraph G {
+  "device address" [style = filled fillcolor = red shape = box]
+  "main account address" [style = filled fillcolor = red shape = box]
+  "device description" [style = filled fillcolor = red shape = box]
+  "user defined callbacks" [style = filled fillcolor = red shape = box]
+  "contract source" [shape = box]
+
+  x [style=invis, height=0, label=""]
+
+  "contract source" -> "contract address"
+  "contract source" -> "contract ABI"
+  "device address" -> "contract address"
+  "main account address" -> "contract address"
+  "main account address" -> "device code template"
+  "contract address" -> "device code template"
+  "contract address" -> "client REST API service"
+  "contract ABI" -> "device code template"
+  "contract ABI" -> "client REST API service"
+  "device code template" -> "device code"
+  "user defined callbacks" -> "device code"
+  "device description" -> "device code template"
+  "device description" -> "client REST API service"
+
+  {rank=same "device address" "main account address" "device description" }
+}
+
+
+digraph G {
+  "device address" [style = filled fillcolor = red shape = box]
+  "main account address" [style = filled fillcolor = red shape = box]
+  "device description" [style = filled fillcolor = red shape = box]
+  "user defined callbacks" [style = filled fillcolor = red shape = box]
+  "contract source" [shape = box]
+  "contract address" [style = filled fillcolor = lightblue]
+  "client REST API service" [style = filled fillcolor = lightblue]
+  "device code" [style = filled fillcolor = lightblue]
+
+  x [style=invis, height=0, label=""]
+  y [style=invis, height=0, label=""]
+  z [style=invis, height=0, label=""]
+  w [style=invis, height=0, label=""]
+
+  "contract source" -> x [dir=none]
+  "contract source" -> "contract ABI"
+  "device address" -> x [dir=none]
+  x -> "contract address"
+  "main account address" -> x [dir=none]
+  "main account address" -> w [dir=none]
+  "contract address" -> w [dir=none]
+  "contract address" -> z [dir=none]
+  "contract ABI" -> w [dir=none]
+  "contract ABI" -> z [dir=none]
+  "device code template" -> y [dir=none]
+  "user defined callbacks" -> y [dir=none]
+  y -> "device code"
+  "device description" -> w [dir=none]
+  "device description" -> z [dir=none]
+  z -> "client REST API service"
+  w -> "device code template"
+
+}

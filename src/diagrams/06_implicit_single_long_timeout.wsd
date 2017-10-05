@@ -1,0 +1,44 @@
+title implicit_single_long_timeout
+
+participant device_registry
+participant client1
+participant contract
+participant client2
+participant device
+
+client1->+device_registry: request device descriptor
+note left of device_registry: contract address,\nservices, etc.
+device_registry-->-client1: device descriptor
+
+client1->+contract: request
+note right of contract: validate\nrequest...
+contract-->-client1: confirmation\n(request id)
+
+note right of client1: no action...\n(timeout)
+
+client2->+device_registry: request device descriptor
+note left of device_registry: contract address,\nservices, etc.
+device_registry-->-client2: device descriptor
+
+client2->+contract: request
+note right of contract: validate\nrequest...
+contract-->-client2: confirmation\n(request id)
+
+client2->+device: connect, send request id
+note right of device: validate\nrequest...
+
+device->+contract: execution_started
+contract-->-device: confirmation
+
+device-->client2: data
+device-->client2: data
+device-->client2: data
+
+device->+contract: execution_finished
+contract-->-device: confirmation
+
+device-->-client2:
+
+client1->+contract: cancel
+note right of contract: validate\nrequest...
+contract-->-client1: confirmation\nreimbursement

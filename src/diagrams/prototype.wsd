@@ -1,0 +1,46 @@
+title prototype
+
+participant client
+participant device
+participant contract
+participant container
+
+device->device: generate\nkeys
+
+device->device: listen to ws\nconnections
+
+client->+contract: request
+note right of contract: validate...
+contract-->-client: requestId
+
+client->device: requestId
+
+device->+contract: access_started(requestId)
+note right of contract: validate...
+contract-->-device: receipt
+
+device->client: (prime, gen)\npubkey
+
+client->client: compute secret
+
+client->device: pubkey
+
+device->device: compute secret
+
+device->+container: start
+note right of container: start\nssh server
+container-->-device:
+
+device->client: approval
+
+client->+container: ssh
+note right of container: ...
+container-->-client:
+
+device->+container: stop
+note right of container: stop\nssh server
+container-->-device:
+
+device->+contract: access_finished(requestId)
+note right of contract: validate...
+contract-->-device: receipt
