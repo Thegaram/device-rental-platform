@@ -1,0 +1,19 @@
+{
+  "name": "local",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dockerode": "^2.5.1",
+    "minimist": "^1.2.0",
+    "ssh2-client": "^1.2.1",
+    "web3": "^1.0.0-beta.22",
+    "winston": "^2.4.0",
+    "ws": "^3.2.0"
+  }
+}
