@@ -31,7 +31,22 @@ contract DeviceContract {
 
     // INSERT USER-DEFINED CONSTANTS
     // <USER_CODE>
+    address public owner;
+    address public device;
 
+    modifier onlyOwnerOrDevice {
+        require(msg.sender == owner || msg.sender == device);
+        _;
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+
+    function setDeviceAddress(address newDevice) onlyOwner public {
+        device = newDevice;
+    }
     // </USER_CODE>
 
 
@@ -213,17 +228,17 @@ contract DeviceContract {
     /////////////// INIT //////////////////////
     ///////////////////////////////////////////
 
-    function DeviceContract(uint timeoutSeconds, uint256 pricePerSecond) public {
+    function DeviceContract(uint timeoutSeconds, uint256 pricePerSecond, address dev) public {
         initializeExecutionEngine();
 
         nonce = 1;
         timeout = timeoutSeconds;
         weiPerSecond = pricePerSecond;
 
-
         // INSERT ADDICTIONAL INIT CODE
         // <USER_CODE>
-
+        owner = msg.sender;
+        device = dev;
         // </USER_CODE>
     }
 
@@ -252,15 +267,15 @@ contract DeviceContract {
         // EMPTY
     }
 
-    function access_started(int id) external transitionNext(Transition.AccessStarted, id) {
+    function access_started(int id) external transitionNext(Transition.AccessStarted, id) onlyOwnerOrDevice {
         // EMPTY
     }
 
-    function access_finished(int id) external transitionNext(Transition.AccessFinished, id) {
+    function access_finished(int id) external transitionNext(Transition.AccessFinished, id) onlyOwnerOrDevice {
         // EMPTY
     }
 
-    function access_failed(int id) external transitionNext(Transition.AccessFailed, id) {
+    function access_failed(int id) external transitionNext(Transition.AccessFailed, id) onlyOwnerOrDevice {
         // EMPTY
     }
 
