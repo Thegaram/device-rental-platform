@@ -34,7 +34,6 @@ winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 
 const container_name = 'eg_sshd';
 const ssh_port = '4000';
-const keep_alive_seconds = 10;
 
 
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
@@ -61,12 +60,13 @@ const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, a
     // receive initial request with request ID
     winston.info('waiting for request ID...');
     let req = await wsp.receive();
-    winston.info(`received request ID: ${req.requestId}!`);
+    const requestId = req.requestId;
+    winston.info(`received request ID: ${requestId}!`);
 
 
     // start access on contract
-    winston.info(`starting access on contract for ${req.requestId}...`);
-    await contract.access_started(req.requestId, 1000000);
+    winston.info(`starting access on contract for ${requestId}...`);
+    await contract.access_started(requestId, argv.gas);
     winston.info('access started on contract!');
     
 
@@ -100,8 +100,9 @@ const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, a
 
 
     // wait and then stop access
-    winston.info(`allowing access for ${keep_alive_seconds} seconds...`);  
-    await Utils.sleep(keep_alive_seconds * 1000);
+    const keepAliveSeconds = await contract.getAllowedExecutionTimeSeconds(requestId);
+    winston.info(`allowing access for ${keepAliveSeconds} seconds...`);
+    await Utils.sleep(keepAliveSeconds * 1000);
     winston.info('stopping container...');
     await container.stop();
     winston.info('container stopped!');
@@ -109,7 +110,7 @@ const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, a
 
     // finish access on contract
     winston.info('finishing access on contract...');
-    await contract.access_finished(req.requestId, 1000000);
+    await contract.access_finished(requestId, argv.gas);
     winston.info('access finished on contract!');
 });
 })();

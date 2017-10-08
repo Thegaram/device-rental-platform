@@ -10,6 +10,9 @@ contract DeviceContract {
     uint private queueTime; // !
     int private nonce;
 
+    uint256 public weiPerSecond;
+    uint public timeout;
+
     // INSERT USER-DEFINED VARIABLES
     // <USER_CODE>
     struct Request {
@@ -28,7 +31,7 @@ contract DeviceContract {
 
     // INSERT USER-DEFINED CONSTANTS
     // <USER_CODE>
-    uint public timeout;
+
     // </USER_CODE>
 
 
@@ -210,11 +213,12 @@ contract DeviceContract {
     /////////////// INIT //////////////////////
     ///////////////////////////////////////////
 
-    function DeviceContract(uint timeoutSeconds) public {
+    function DeviceContract(uint timeoutSeconds, uint256 pricePerSecond) public {
         initializeExecutionEngine();
 
         nonce = 1;
         timeout = timeoutSeconds;
+        weiPerSecond = pricePerSecond;
 
 
         // INSERT ADDICTIONAL INIT CODE
@@ -270,9 +274,9 @@ contract DeviceContract {
 
     // USER-DEFINED FUNCTIONS
     // <USER_CODE>
-    function validateRequest(Request r) internal view returns (bool) {
-        // TODO: validate ether amount
-        return true;
+    function validateRequest(Request r) internal view {
+        require(r.value > 0);
+        require(r.value % weiPerSecond == 0);
     }
 
     function registerRequest() internal {
@@ -297,6 +301,13 @@ contract DeviceContract {
 
     function markRequestAsExecuted(int id) internal {
         delete incompleteRequests[id];
+    }
+
+    function getAllowedExecutionTimeSeconds(int id) public view returns (uint) {
+        var r = incompleteRequests[id];
+        // note: throws on nonexistent entry
+
+        return r.value / weiPerSecond;
     }
     // </USER_CODE>
 }

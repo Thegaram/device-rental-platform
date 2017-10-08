@@ -17,7 +17,8 @@ var argv = require('minimist')(process.argv.slice(2), {
     wsUrl: 'ws://localhost:3333',
     debug: false,
     confreq: 12,
-    gas: 1000000
+    gas: 1000000,
+    accessTimeSeconds: 10
   }
 });
 
@@ -34,15 +35,17 @@ if (!argv.contractaddr) {
 winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 
 
-const price = 140000000000000000;
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
 const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.ethaddr, argv.confreq);
 
 
 (async () => {
+  const pricePerSecond = await contract.weiPerSecond();
+  const paymentValue = argv.accessTimeSeconds * pricePerSecond;
+
   // request access from contract
   winston.info('requesting access from contract...');
-  let requestId = await contract.request(price, argv.gas);
+  let requestId = await contract.request(paymentValue, argv.gas);
   winston.info(`access granted! requestId = ${requestId}`);
 
 
@@ -65,7 +68,6 @@ const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, a
   winston.debug(secret);
 
   const approval = await wsp.request({
-    requestId: requestId,
     pubkey: dh.getPublicKey()
   });
 

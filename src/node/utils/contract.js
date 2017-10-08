@@ -52,6 +52,14 @@ class Contract {
   access_finished(requestId, gas, nconfirmations) {
     return this.sendTransaction('access_finished', [requestId], undefined, gas, nconfirmations);
   }
+
+  getAllowedExecutionTimeSeconds(requestId) {
+    return this.contract.methods.getAllowedExecutionTimeSeconds(requestId).call();
+  }
+
+  weiPerSecond() {
+    return this.contract.methods.weiPerSecond().call();
+  }
 }
 
 module.exports = Contract;
