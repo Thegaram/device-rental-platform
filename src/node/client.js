@@ -10,7 +10,7 @@ const Utils = require('./utils/utils.js');
 
 
 var argv = require('minimist')(process.argv.slice(2), {
-  string: ['ethaddr', 'contractaddr', 'ethNodeUrl', 'wsUrl'],
+  string: ['privkey', 'contractaddr', 'ethNodeUrl', 'wsUrl'],
   boolean: ['debug'],
   default: {
     ethNodeUrl: 'http://localhost:8545',
@@ -22,8 +22,8 @@ var argv = require('minimist')(process.argv.slice(2), {
   }
 });
 
-if (!argv.ethaddr) {
-  console.error('ethereum address not set! please use the --ethaddr option!');
+if (!argv.privkey) {
+  console.error('ethereum address not set! please use the --privkey option!');
   process.exit(1);
 }
 
@@ -34,10 +34,8 @@ if (!argv.contractaddr) {
 
 winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 
-
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
-const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.ethaddr, argv.confreq);
-
+const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.privkey, argv.confreq);
 
 (async () => {
   const pricePerSecond = await contract.weiPerSecond();

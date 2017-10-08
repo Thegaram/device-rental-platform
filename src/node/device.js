@@ -9,7 +9,7 @@ const Utils = require('./utils/utils.js');
 
 
 var argv = require('minimist')(process.argv.slice(2), {
-  string: ['ethaddr', 'contractaddr', 'ethNodeUrl', 'wsport'],
+  string: ['privkey', 'contractaddr', 'ethNodeUrl', 'wsport'],
   boolean: ['debug'],
   default: {
     ethNodeUrl: 'http://localhost:8545',
@@ -20,8 +20,8 @@ var argv = require('minimist')(process.argv.slice(2), {
   }
 });
 
-if (!argv.ethaddr) {
-  console.error('ethereum address not set! please use the --ethaddr option!');
+if (!argv.privkey) {
+  console.error('ethereum address not set! please use the --privkey option!');
   process.exit(1);
 }
 
@@ -35,9 +35,8 @@ winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 const container_name = 'eg_sshd';
 const ssh_port = '4000';
 
-
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
-const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.ethaddr, argv.confreq);
+const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.privkey, argv.confreq);
 
 
 (() => {
@@ -112,5 +111,5 @@ const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, a
     winston.info('finishing access on contract...');
     await contract.access_finished(requestId, argv.gas);
     winston.info('access finished on contract!');
-});
+  });
 })();

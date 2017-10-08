@@ -13,12 +13,12 @@ src/docker $ docker build -t eg_sshd .
 
 3. **start testrpc**
 ```
-src $ testrpc -b 1
+src $ testrpc -b 1 -d
 ```
 
-(`-b 1` means we enable automatic mining every second.)
+(`-b 1` means we enable automatic mining every second, `-d` means we want to get the same addresses and keys every time we run this command.)
 
-Note down the available accounts you would like to use.
+Note down the available accounts you would like to use and their private keys.
 
 4. **compile and deploy contracts**
 ```
@@ -29,14 +29,14 @@ Note down the address of the contract `DeviceContract`.
 
 5. **run device program, providing the `ethaddr` and `contractaddr` options**
 ```
-src/node $ node device.js --ethaddr=0xd439371cd35ab4dc748fae49ba5caa8d0c0725b5 --contractaddr=0x8612110fcb0496729604111ef8b0c7354dafac48 --confreq=4 --debug
+src/node $ node device.js --contractaddr=0xc89ce4735882c9f0f0fe26686c53074e09b0d550 --privkey="6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1" --confreq=4 --debug
 ```
 
 (For a full list of command line options, please refer to the source code. The addresses above are just examples, the ones you use should be taken from `testrpc`'s output.)
 
 6. **run client program**
 ```
-src/node $ node client.js --ethaddr="0x41d3249ba7777740589f9183c53017a01b7ebe21" --contractaddr="0x8612110fcb0496729604111ef8b0c7354dafac48" --confreq=4 --debug
+src/node $ node client.js --contractaddr="0xc89ce4735882c9f0f0fe26686c53074e09b0d550" --privkey="4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d" --confreq=4 --debug --accessTimeSeconds=5
 ```
 
 (For a full list of command line options, please refer to the source code. The addresses above are just examples, the ones you use should be taken from `testrpc`'s output.)
