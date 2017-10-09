@@ -1,15 +1,8 @@
 const crypto = require('crypto');
 
 class DH {
-  constructor(a, b) {
-    // a: primeSize    OR
-    // a: prime, b: generator
-
-    if (b === undefined)
-      this.dh = crypto.createDiffieHellman(a);
-    else
-      this.dh = crypto.createDiffieHellman(a, 'hex', b, 'hex');
-    
+  constructor(prime) {
+    this.dh = crypto.createDiffieHellman(prime, 'hex');
     this.dh.generateKeys();
   }
 

@@ -37,13 +37,21 @@ winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
 const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.privkey, argv.confreq);
 
+const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a0924e923310269d10461aba31e7183be58286ddd79861ee3eb1278e032c6defc5e466abe830500cc16fc629c60076b2e0e9dc38e2b4d3fb4e6d67d41c4546b4b0a006d86dc488a9444b8f3fb0e9538f0fc4e1817ccb55b951fa61bd3199beb9a2c850279e0916f625d851784a1c000ca6ebdc325806ad1ff48b3b95ffe49af65b227ff46f263d53d6d7d16cf610a830dbf14cab5de3db65c826b3004cb9bda5bf2f73bb9caa8d551635dbb2d8ff08b5674cb98d0e311017a35fb34c7652418fa16823b0424134bbe185e0c9da5c9aaef97d81cc7c9e0a76a5917f0f43e22afe7ab';
+
 (async () => {
   const pricePerSecond = await contract.weiPerSecond();
   const paymentValue = argv.accessTimeSeconds * pricePerSecond;
 
+  // generate keys for key exchange
+  winston.info('generating keys...');
+  const dh = new DH(prime);
+  winston.info('keys generated successfully!');
+
+
   // request access from contract
   winston.info('requesting access from contract...');
-  let requestId = await contract.request(paymentValue, argv.gas);
+  const requestId = await contract.request(paymentValue, argv.gas);
   winston.info(`access granted! requestId = ${requestId}`);
 
 
@@ -57,23 +65,23 @@ const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, a
 
   // request access from device and perform key exchange
   winston.info('requesting access from device...')
-  const reply = await wsp.request({ requestId: requestId });
-
-  winston.info('performing key exchange...')
-  const dh = new DH(reply.prime, reply.generator);
-  const secret = dh.computeSecret(reply.pubkey);
-  winston.info('established shared secret!');
-  winston.debug(secret);
-
   const approval = await wsp.request({
+    requestId: requestId,
     pubkey: dh.getPublicKey()
   });
 
   if (approval.status != 'APPROVED') {
     // TODO
+    return;
   }
 
   winston.info('access granted!');
+
+
+  // establish secret
+  const secret = dh.computeSecret(approval.pubkey);
+  winston.info('established shared secret!');
+  winston.debug(secret);
 
 
   // close websocket connection
