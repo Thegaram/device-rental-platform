@@ -4,7 +4,7 @@ const abiDecoder = require('abi-decoder');
 
 class Contract {
   constructor(nodeUrl, abi, contractAddress, senderPrivateKey, nconfirmationsdef) {
-    this.web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl));
+    this.web3 = new Web3(new Web3.providers.WebsocketProvider(nodeUrl));
     this.contract = new this.web3.eth.Contract(abi, contractAddress);
 
     this.contractAddress = contractAddress;
@@ -13,6 +13,50 @@ class Contract {
     this.nconfirmationsdef = nconfirmationsdef;
 
     abiDecoder.addABI(abi);
+  }
+
+  async waitForNewRequest() {
+    const eventData = await this.waitForEvent('NewRequest');
+    await this.waitUntilBlock(eventData.blockNumber + this.nconfirmationsdef - 1);
+    return {
+      requestId: eventData.returnValues.requestId,
+      pubkey: eventData.returnValues.pubkey
+    };
+  }
+
+  async waitForApproval() {
+    const eventData = await this.waitForEvent('RequestApproved');
+    await this.waitUntilBlock(eventData.blockNumber + this.nconfirmationsdef - 1);
+    return {
+      requestId: eventData.returnValues.requestId,
+      pubkey: eventData.returnValues.pubkey,
+      data: JSON.parse(eventData.returnValues.data)
+    };
+  }
+
+  waitForEvent(eventName) {
+    return new Promise((resolve, reject) => {
+      const subscription = this.contract.events[eventName]((error, result) => {
+        if (error)
+          return reject(error);
+
+        subscription.unsubscribe(); // TODO: check if succeeds
+        resolve(result);
+      });
+    });
+  }
+
+  waitUntilBlock(blockNumber) {
+    return new Promise((resolve, reject) => {
+      const subscription = this.web3.eth.subscribe('newBlockHeaders')
+        .on('data', data => {
+          if (data.number == blockNumber) {
+            subscription.unsubscribe(); // TODO: check if succeeds
+            resolve();
+          }
+        })
+        .on('error', reject);
+    });
   }
 
   sendTransaction(rawTransaction, nconfirmations, gas) {
@@ -61,13 +105,13 @@ class Contract {
     return rawTransaction;
   }
 
-  async request(value, gas, nconfirmations) {
-    const rawTransaction = await this.getRawTxData('request', [], value, gas);
+  async request(pubkey, value, gas, nconfirmations) {
+    const rawTransaction = await this.getRawTxData('request', [pubkey], value, gas);
     return await this.sendTransaction(rawTransaction, nconfirmations, gas);
   }
 
-  async access_started(requestId, gas, nconfirmations) {
-    const rawTransaction = await this.getRawTxData('access_started', [requestId], 0, gas);
+  async access_started(requestId, pubkey, data, gas, nconfirmations) {
+    const rawTransaction = await this.getRawTxData('access_started', [requestId, pubkey, data], 0, gas);
     return await this.sendTransaction(rawTransaction, nconfirmations, gas);
   }
 

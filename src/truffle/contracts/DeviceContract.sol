@@ -56,7 +56,8 @@ contract DeviceContract {
     
     // INSERT USER-DEFINED EVENTS
     // <USER_CODE>
-    event NewRequest(int indexed id);
+    event NewRequest(int indexed requestId, string pubkey);
+    event RequestApproved(int indexed requestId, string pubkey, string data);
     // </USER_CODE>
 
 
@@ -259,16 +260,18 @@ contract DeviceContract {
     /////////////// TRANSITIONS ///////////////
     ///////////////////////////////////////////
 
-    function request() external payable transitionNext(Transition.Request, 0) { // !
+    function request(string pubkey) external payable transitionNext(Transition.Request, 0) { // !
         // EMPTY
+        NewRequest(currentRequestId, pubkey);
     }
 
     function cancel(int id) external transitionNext(Transition.Cancel, id) {
         // EMPTY
     }
 
-    function access_started(int id) external transitionNext(Transition.AccessStarted, id) onlyOwnerOrDevice {
+    function access_started(int id, string pubkey, string data) external transitionNext(Transition.AccessStarted, id) onlyOwnerOrDevice {
         // EMPTY
+        RequestApproved(currentRequestId, pubkey, data);
     }
 
     function access_finished(int id) external transitionNext(Transition.AccessFinished, id) onlyOwnerOrDevice {
@@ -299,8 +302,6 @@ contract DeviceContract {
         validateRequest(r);
         
         incompleteRequests[currentRequestId] = r;
-
-        NewRequest(currentRequestId);
     }
 
     function withdrawFunds(int id) internal {

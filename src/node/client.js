@@ -1,20 +1,17 @@
 const winston = require('winston');
-const WS = require('ws');
 const minimist = require('minimist');
 
 const Contract = require('./utils/contract.js');
 const ssh = require('./utils/ssh.js');
-const WSP = require('./utils/ws.js');
 const DH = require('./utils/dh.js');
 const Utils = require('./utils/utils.js');
 
 
 var argv = require('minimist')(process.argv.slice(2), {
-  string: ['privkey', 'contractaddr', 'ethNodeUrl', 'wsUrl'],
+  string: ['privkey', 'contractaddr', 'ethNodeUrl'],
   boolean: ['debug'],
   default: {
-    ethNodeUrl: 'http://localhost:8545',
-    wsUrl: 'ws://localhost:3333',
+    ethNodeUrl: 'ws://localhost:8546',
     debug: false,
     confreq: 12,
     gas: 1000000,
@@ -46,56 +43,29 @@ const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a092
   // generate keys for key exchange
   winston.info('generating keys...');
   const dh = new DH(prime);
+  const pubkey = dh.getPublicKey();
   winston.info('keys generated successfully!');
-
 
   // request access from contract
   winston.info('requesting access from contract...');
-  const requestId = await contract.request(paymentValue, argv.gas);
+  const requestId = await contract.request(pubkey, paymentValue, argv.gas);
   winston.info(`access granted! requestId = ${requestId}`);
 
-
-  // connect to device through websocket
-  winston.info('connecting to device...');
-  const ws = new WS(argv.wsUrl);
-  const wsp = new WSP(ws);
-  await wsp.open();
-  winston.info('connected to device!');
-
-
-  // request access from device and perform key exchange
-  winston.info('requesting access from device...')
-  const approval = await wsp.request({
-    requestId: requestId,
-    pubkey: dh.getPublicKey()
-  });
-
-  if (approval.status != 'APPROVED') {
-    // TODO
-    return;
-  }
-
+  // wait for approval
+  const approval = await contract.waitForApproval();
   winston.info('access granted!');
-
 
   // establish secret
   const secret = dh.computeSecret(approval.pubkey);
   winston.info('established shared secret!');
   winston.debug(secret);
 
-
-  // close websocket connection
-  winston.info('closing ws connection...');
-  await wsp.close();
-  winston.info('ws connection closed!');
-
-
   // connect through ssh
   winston.info('starting ssh session...');
   await ssh.shell({
-    host: approval.host,
-    port: approval.port,
-    username: approval.username,
+    host: approval.data.host,
+    port: approval.data.port,
+    username: approval.data.username,
     password: secret,
     // askPassword: true,
     // debug: console.log,

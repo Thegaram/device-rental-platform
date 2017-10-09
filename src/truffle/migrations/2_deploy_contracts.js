@@ -7,5 +7,5 @@ module.exports = function(deployer) {
   deployer.link(ConvertLib, MetaCoin);
   deployer.deploy(MetaCoin);
 
-  deployer.deploy(DeviceContract, 10, 1000, '0xffcf8fdee72ac11b5c542428b35eef5769c409f0');
+  deployer.deploy(DeviceContract, 10, 1000, '0x725e67c6eb9e8deff544525cb1be48a920b652b3');
 };
