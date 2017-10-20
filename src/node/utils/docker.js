@@ -33,14 +33,13 @@ function changeContainerPassword(container, password) {
 }
 
 class SSHContainer {
-  constructor(container_name, ssh_port, password) {
+  constructor(container_name, ssh_port) {
     this.container = null;
     this.container_name = container_name;
     this.ssh_port = ssh_port;
-    this.password = password;
   }
 
-  async start() {
+  async start_access(requestId, password) {
     this.container = await docker.createContainer({
       Image: this.container_name,
       PortBindings: { '22/tcp': [{ 'HostPort': this.ssh_port }] }
@@ -48,17 +47,15 @@ class SSHContainer {
 
     this.container = await this.container.start();
 
-    await changeContainerPassword(this.container, this.password);
+    await changeContainerPassword(this.container, password);
 
     // make sure ssh server is set up...
     await Utils.sleep(200);
   }
 
-  async stop() {
+  async stop_access(requestId) {
     await this.container.stop();
   }
 }
 
-module.exports = {
-  SSHContainer
-};
+module.exports = SSHContainer;

@@ -2,7 +2,8 @@ const winston = require('winston');
 
 const Contract = require('./utils/contract.js');
 const DH = require('./utils/dh.js');
-const SSHContainer = require('./utils/docker.js').SSHContainer;
+const SSHContainer = require('./utils/docker.js');
+const Server = require('./utils/server.js');
 const Utils = require('./utils/utils.js');
 
 
@@ -31,6 +32,7 @@ winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 
 const container_name = 'eg_sshd';
 const ssh_port = '4000';
+const http_port = 8000;
 
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
 const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.privkey, argv.confreq);
@@ -42,6 +44,9 @@ winston.info('generating keys...');
 const dh = new DH(prime);
 const pubkey = dh.getPublicKey();
 winston.info('keys generated successfully!');
+
+// const service = new SSHContainer(container_name, ssh_port);
+const service = new Server(http_port);
 
 (async function requestLoop() {
   while (true) {
@@ -61,29 +66,34 @@ async function handleRequest(request) {
   winston.info('established shared secret!');
   winston.debug(secret);
 
-  // start container
-  winston.info('starting container...');
-  const container = new SSHContainer(container_name, ssh_port, secret);
-  await container.start();
-  winston.info('container started!');
+  // start access on service
+  winston.info('starting access on service...');
+  await service.start_access(request.requestId, secret);
+  winston.info('access started on service!');
 
   // start access on contract
   winston.info(`starting access on contract for ${request.requestId}...`);
+  const keepAliveSeconds = await contract.getAllowedExecutionTimeSeconds(request.requestId);
+  // const data = JSON.stringify({
+  //   host: 'localhost',
+  //   port: ssh_port,
+  //   username: 'root',
+  // });
   const data = JSON.stringify({
-    host: 'localhost',
-    port: ssh_port,
-    username: 'root',
+    url: `https://localhost:${http_port}/temperature`,
+    auth: 'basic auth (requestId/password)',
+    format: 'json',
+    access_time: keepAliveSeconds
   });
   await contract.access_started(request.requestId, pubkey, data, argv.gas);
   winston.info('access started on contract!');
 
   // wait and then stop access
-  const keepAliveSeconds = await contract.getAllowedExecutionTimeSeconds(request.requestId);
   winston.info(`allowing access for ${keepAliveSeconds} seconds...`);
   await Utils.sleep(keepAliveSeconds * 1000);
-  winston.info('stopping container...');
-  await container.stop();
-  winston.info('container stopped!');
+  winston.info('stopping access on service...');
+  await service.stop_access(request.requestId);
+  winston.info('access stopped on service!');
 
   // finish access on contract
   winston.info('finishing access on contract...');
