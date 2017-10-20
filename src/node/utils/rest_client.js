@@ -2,7 +2,7 @@ const https = require('https');
 
 const regex = /^(https?):\/\/([a-zA-Z0-9._]+)(?::(\d+))?(\/[a-zA-Z0-9._\/]+)?$/;
 
-function performRequest(url, requestId, secret) {
+function request(url, requestId, secret) {
   const matches = regex.exec(url);
 
   const options = {
@@ -33,5 +33,5 @@ function performRequest(url, requestId, secret) {
 }
 
 module.exports = {
-  perform: performRequest
+  request
 };

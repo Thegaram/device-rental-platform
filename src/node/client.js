@@ -2,8 +2,8 @@ const winston = require('winston');
 const minimist = require('minimist');
 
 const Contract = require('./utils/contract.js');
-const ssh = require('./utils/ssh.js');
-const request = require('./utils/request');
+const ssh = require('./utils/ssh_client.js');
+// const client = require('./utils/rest_client');
 const client = require('./utils/rpc_client');
 const DH = require('./utils/dh.js');
 const Utils = require('./utils/utils.js');
@@ -73,10 +73,6 @@ const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a092
   //   // debug: console.log,
   // });
   // winston.info('ssh connection closed!');
-
-  // winston.info('requesting resource...');
-  // const response = await request.perform(approval.data.url, requestId, secret);
-  // winston.debug(response);
 
   winston.info('requesting resource...');
   const response = await client.request(approval.data.url, requestId, secret);

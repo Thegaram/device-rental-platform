@@ -2,8 +2,8 @@ const winston = require('winston');
 
 const Contract = require('./utils/contract.js');
 const DH = require('./utils/dh.js');
-const SSHContainer = require('./utils/docker.js');
-const Server = require('./utils/server.js');
+const SSHServer = require('./utils/ssh_server.js');
+const RESTServer = require('./utils/rest_server.js');
 const RPCServer = require('./utils/rpc_server.js');
 const Utils = require('./utils/utils.js');
 
@@ -47,8 +47,8 @@ const dh = new DH(prime);
 const pubkey = dh.getPublicKey();
 winston.info('keys generated successfully!');
 
-// const service = new SSHContainer(container_name, ssh_port);
-// const service = new Server(http_port);
+// const service = new SSHServer(container_name, ssh_port);
+// const service = new RESTServer(http_port);
 const service = new RPCServer(rpc_port);
 
 (async function requestLoop() {
