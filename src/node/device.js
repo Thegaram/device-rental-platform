@@ -4,6 +4,7 @@ const Contract = require('./utils/contract.js');
 const DH = require('./utils/dh.js');
 const SSHContainer = require('./utils/docker.js');
 const Server = require('./utils/server.js');
+const RPCServer = require('./utils/rpc_server.js');
 const Utils = require('./utils/utils.js');
 
 
@@ -33,6 +34,7 @@ winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 const container_name = 'eg_sshd';
 const ssh_port = '4000';
 const http_port = 8000;
+const rpc_port = 50051;
 
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
 const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.privkey, argv.confreq);
@@ -46,7 +48,8 @@ const pubkey = dh.getPublicKey();
 winston.info('keys generated successfully!');
 
 // const service = new SSHContainer(container_name, ssh_port);
-const service = new Server(http_port);
+// const service = new Server(http_port);
+const service = new RPCServer(rpc_port);
 
 (async function requestLoop() {
   while (true) {
@@ -79,11 +82,14 @@ async function handleRequest(request) {
   //   port: ssh_port,
   //   username: 'root',
   // });
+  // const data = JSON.stringify({
+  //   url: `https://localhost:${http_port}/temperature`,
+  //   auth: 'basic auth (requestId/password)',
+  //   format: 'json',
+  //   access_time: keepAliveSeconds
+  // });
   const data = JSON.stringify({
-    url: `https://localhost:${http_port}/temperature`,
-    auth: 'basic auth (requestId/password)',
-    format: 'json',
-    access_time: keepAliveSeconds
+    url: `localhost:${rpc_port}`,
   });
   await contract.access_started(request.requestId, pubkey, data, argv.gas);
   winston.info('access started on contract!');

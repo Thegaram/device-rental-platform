@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package temperatureservice;
+
+service TemperatureService {
+  rpc RetrieveTemperature (EmptyParams) returns (TemperatureReading) {}
+}
+
+message EmptyParams {}
+
+message TemperatureReading {
+    int32 value = 1;
+}
