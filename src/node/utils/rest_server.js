@@ -4,8 +4,8 @@ const express = require('express');
 const basicAuth = require('express-basic-auth');
 
 const credentials = {
-  key : fs.readFileSync('sslcert/server.key', 'utf8'),
-  cert: fs.readFileSync('sslcert/server.crt', 'utf8')
+  key : fs.readFileSync('sslcert/localhost.key', 'utf8'),
+  cert: fs.readFileSync('sslcert/localhost.crt', 'utf8')
 };
 
 function getRandomInt(min, max) {

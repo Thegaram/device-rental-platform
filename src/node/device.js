@@ -84,8 +84,6 @@ async function handleRequest(request) {
   // });
   // const data = JSON.stringify({
   //   url: `https://localhost:${http_port}/temperature`,
-  //   auth: 'basic auth (requestId/password)',
-  //   format: 'json',
   //   access_time: keepAliveSeconds
   // });
   const data = JSON.stringify({

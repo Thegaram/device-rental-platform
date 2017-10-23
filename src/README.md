@@ -70,7 +70,16 @@ Note down the contract address (`0xb1df3bd91ab7ff0426943e46bdc9ef52c150b69e` in 
 blockchain_iot/src/docker $ docker build -t eg_sshd .
 ```
 
-4. **run device program**
+4. **generate SSL certificate**
+```
+blockchain_iot/src/node $ openssl req -x509 -sha256 -nodes -newkey rsa:2048 -days 365 -keyout sslcert/localhost.key -out sslcert/localhost.crt
+Generating a 2048 bit RSA private key
+...
+Common Name (e.g. server FQDN or YOUR name) []:localhost
+...
+```
+
+5. **run device program**
 ```
 blockchain_iot/src/node $ npm install
 blockchain_iot/src/node $ node device.js --contractaddr="<<contract address>>" --privkey="4aae80eb87a8e986c3825e323c186c67742852b7ce42fbd17494f1aab62c4ba5" --confreq=4 --debug
@@ -78,7 +87,7 @@ blockchain_iot/src/node $ node device.js --contractaddr="<<contract address>>" -
 
 Replace the placeholder `<<contract address>>` with the address you just noted down.
 
-5. **run client program**
+6. **run client program**
 ```
 blockchain_iot/src/node $ node client.js --contractaddr="<<contract address>>" --privkey="0649f1ba06eb15d5f293e8943a6cd3be6396ca981ea87412faa3e8cc8338dbc5" --confreq=4 --debug --accessTimeSeconds=5
 ```

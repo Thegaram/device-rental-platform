@@ -24,11 +24,19 @@ function getServer() {
   return server;
 }
 
+const creds = grpc.ServerCredentials.createSsl(
+  null,
+  [{
+    private_key: fs.readFileSync('sslcert/localhost.key'),
+    cert_chain: fs.readFileSync('sslcert/localhost.crt')
+  }],
+  true
+);
+
 class RPC {
   constructor(port) {
     this.routeServer = getServer();
-    this.routeServer.bind(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure());
-    // TODO: use SSL
+    this.routeServer.bind(`0.0.0.0:${port}`, creds);
     this.routeServer.start();
   }
 
