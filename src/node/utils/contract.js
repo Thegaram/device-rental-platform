@@ -127,6 +127,15 @@ class Contract {
   weiPerSecond() {
     return this.contract.methods.weiPerSecond().call();
   }
+
+  certificate() {
+    return this.contract.methods.certificate().call();
+  }
+
+  async setCertificate(cert, gas, nconfirmations) {
+    const rawTransaction = await this.getRawTxData('setCertificate', [cert], 0, gas);
+    return await this.sendTransaction(rawTransaction, nconfirmations, gas);
+  }
 }
 
 module.exports = Contract;

@@ -48,6 +48,11 @@ const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a092
   const pubkey = dh.getPublicKey();
   winston.info('keys generated successfully!');
 
+  // retrieve server certificate
+  winston.info('retrieving server certificate...');
+  const certificate = await contract.certificate();
+  winston.info('server certificate retrieved successfully!');
+
   // request access from contract
   winston.info('requesting access from contract...');
   const requestId = await contract.request(pubkey, paymentValue, argv.gas);
@@ -75,6 +80,6 @@ const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a092
   // winston.info('ssh connection closed!');
 
   winston.info('requesting resource...');
-  const response = await client.request(approval.data.url, requestId, secret);
+  const response = await client.request(approval.data.url, certificate, requestId, secret);
   winston.debug(response);
 })();

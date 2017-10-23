@@ -1,10 +1,8 @@
 const https = require('https');
-const fs = require('fs');
 
 const regex = /^(https?):\/\/([a-zA-Z0-9._]+)(?::(\d+))?(\/[a-zA-Z0-9._\/]+)?$/;
-const cert = fs.readFileSync('sslcert/localhost.crt', 'utf8');
 
-function request(url, requestId, secret) {
+function request(url, certificate, requestId, secret) {
   const matches = regex.exec(url);
 
   const options = {
@@ -13,7 +11,7 @@ function request(url, requestId, secret) {
     port: matches[3] || 443,
     path: matches[4],
     auth: `${requestId}:${secret}`,
-    ca: cert
+    ca: certificate
   };
 
   return new Promise((resolve, reject) => {

@@ -13,6 +13,8 @@ contract DeviceContract {
     uint256 public weiPerSecond;
     uint public timeout;
 
+    string public certificate;
+
     // INSERT USER-DEFINED VARIABLES
     // <USER_CODE>
     struct Request {
@@ -324,6 +326,10 @@ contract DeviceContract {
         // note: throws on nonexistent entry
 
         return r.value / weiPerSecond;
+    }
+
+    function setCertificate(string cert) external onlyOwnerOrDevice {
+        certificate = cert;
     }
     // </USER_CODE>
 }

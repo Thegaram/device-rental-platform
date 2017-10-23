@@ -1,4 +1,5 @@
 const winston = require('winston');
+const fs = require('fs');
 
 const Contract = require('./utils/contract.js');
 const DH = require('./utils/dh.js');
@@ -47,11 +48,25 @@ const dh = new DH(prime);
 const pubkey = dh.getPublicKey();
 winston.info('keys generated successfully!');
 
+async function checkCertificate() {
+  const localCert = fs.readFileSync('sslcert/localhost.crt', 'utf8');
+  const contractCert = await contract.certificate();
+
+  if (localCert !== contractCert) {
+    winston.info('uploading certificate...');
+    await contract.setCertificate(localCert, 100000000);
+    winston.info('certificate uploaded successfully!');
+  }
+}
+
 // const service = new SSHServer(container_name, ssh_port);
 // const service = new RESTServer(http_port);
 const service = new RPCServer(rpc_port);
 
 (async function requestLoop() {
+  winston.info('checking certificate...');
+  await checkCertificate();
+
   while (true) {
     // receive initial request with requestId and pubKey
     console.log();

@@ -1,12 +1,10 @@
 const grpc = require('grpc');
-const fs = require('fs');
 
 const service = grpc.load(__dirname + '/../service.proto').temperatureservice;
-const cert = fs.readFileSync('sslcert/localhost.crt');
 
-function request(url, requestId, secret) {
+function request(url, certificate, requestId, secret) {
   const client = new service.TemperatureService(url,
-    grpc.credentials.createSsl(cert));
+    grpc.credentials.createSsl(Buffer.from(certificate, 'utf8')));
 
   const metadata = new grpc.Metadata();
   metadata.add('username', requestId.toString());
