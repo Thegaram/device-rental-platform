@@ -4,9 +4,9 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 const Utils = require('./utils.js');
 
 
-function changeContainerPassword(container, password) {
+function initializeContainer(container, username, password) {
   var options = {
-    Cmd: ['/bin/bash', '-c', `echo root:${password} | chpasswd`],
+    Cmd: ['/bin/bash', '-c', `useradd ${username}; mkdir /home/${username}; chown ${username}.${username} /home/${username}; echo ${username}:${password} | chpasswd`],
     AttachStdout: true,
     AttachStderr: true
   };
@@ -47,7 +47,7 @@ class SSHContainer {
 
     this.container = await this.container.start();
 
-    await changeContainerPassword(this.container, password);
+    await initializeContainer(this.container, requestId, password);
 
     // make sure ssh server is set up...
     await Utils.sleep(200);
