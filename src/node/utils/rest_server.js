@@ -3,6 +3,8 @@ const https = require('https');
 const express = require('express');
 const basicAuth = require('express-basic-auth');
 
+const Utils = require('./utils.js');
+
 const credentials = {
   key : fs.readFileSync('sslcert/localhost.key', 'utf8'),
   cert: fs.readFileSync('sslcert/localhost.crt', 'utf8')
@@ -29,7 +31,7 @@ function createAsyncAuthorizer(approved_requests) {
     const requestId = username;
     const secret = approved_requests[requestId];
 
-    return cb(null, secret === password);
+    return cb(null, Utils.timingSafeEqual(secret, password));
   };
 }
 

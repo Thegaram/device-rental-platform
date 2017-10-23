@@ -1,6 +1,8 @@
 const fs = require('fs');
 const grpc = require('grpc');
 
+const Utils = require('./utils.js');
+
 const service = grpc.load(__dirname + '/../service.proto').temperatureservice;
 
 const approved_requests = {};
@@ -10,7 +12,7 @@ function retrieveTemperature(call, callback) {
   const password = call.metadata.get('password')[0];
   const secret = approved_requests[username];
 
-  if (secret == password)
+  if (Utils.timingSafeEqual(password, secret))
     callback(null, {value: 15});
   else
     callback('unauthorized');
