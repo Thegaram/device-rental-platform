@@ -2,7 +2,10 @@ const https = require('https');
 
 const regex = /^(https?):\/\/([a-zA-Z0-9._]+)(?::(\d+))?(\/[a-zA-Z0-9._\/]+)?$/;
 
-function request(url, certificate, requestId, secret) {
+function request(data, certificate, password) {
+  const url = data.url;
+  const username = data.username;
+
   const matches = regex.exec(url);
 
   const options = {
@@ -10,7 +13,7 @@ function request(url, certificate, requestId, secret) {
     host: matches[2],
     port: matches[3] || 443,
     path: matches[4],
-    auth: `${requestId}:${secret}`,
+    auth: `${username}:${password}`,
     ca: certificate
   };
 

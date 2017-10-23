@@ -69,17 +69,10 @@ const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a092
 
   // connect through ssh
   // winston.info('starting ssh session...');
-  // await ssh.shell({
-  //   host: approval.data.host,
-  //   port: approval.data.port,
-  //   username: approval.data.username,
-  //   password: secret,
-  //   // askPassword: true,
-  //   // debug: console.log,
-  // });
+  // await ssh.shell(approval.data, secret);
   // winston.info('ssh connection closed!');
 
   winston.info('requesting resource...');
-  const response = await client.request(approval.data.url, certificate, requestId, secret);
+  const response = await client.request(approval.data, certificate, secret);
   winston.debug(response);
 })();

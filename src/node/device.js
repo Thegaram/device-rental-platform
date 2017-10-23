@@ -33,9 +33,7 @@ if (!argv.contractaddr) {
 winston.level = argv.debug ? 'debug' : argv.verbose ? 'verbose' : 'info';
 
 const container_name = 'eg_sshd';
-const ssh_port = '4000';
-const http_port = 8000;
-const rpc_port = 50051;
+const serverPort = '8000';
 
 const contractAbi = require('../truffle/build/contracts/DeviceContract.json').abi;
 const contract = new Contract(argv.ethNodeUrl, contractAbi, argv.contractaddr, argv.privkey, argv.confreq);
@@ -59,9 +57,9 @@ async function checkCertificate() {
   }
 }
 
-// const service = new SSHServer(container_name, ssh_port);
-// const service = new RESTServer(http_port);
-const service = new RPCServer(rpc_port);
+// const service = new SSHServer(container_name, serverPort);
+// const service = new RESTServer(serverPort);
+const service = new RPCServer(serverPort);
 
 (async function requestLoop() {
   winston.info('checking certificate...');
@@ -92,19 +90,26 @@ async function handleRequest(request) {
   // start access on contract
   winston.info(`starting access on contract for ${request.requestId}...`);
   const keepAliveSeconds = await contract.getAllowedExecutionTimeSeconds(request.requestId);
-  // const data = JSON.stringify({
-  //   host: 'localhost',
-  //   port: ssh_port,
-  //   username: request.requestId,
-  // });
-  // const data = JSON.stringify({
-  //   url: `https://localhost:${http_port}/temperature`,
-  //   access_time: keepAliveSeconds
-  // });
-  const data = JSON.stringify({
-    url: `localhost:${rpc_port}`,
-  });
-  await contract.access_started(request.requestId, pubkey, data, argv.gas);
+
+  const data = {
+    username: request.requestId.toString(),
+    accessEndTime: Utils.timeSecondsLater(keepAliveSeconds).toISOString()
+  };
+
+  // ssh
+  // data.accessMode = 'SSH';
+  // data.host = 'localhost';
+  // data.port = serverPort;
+
+  // rest
+  // data.accessMode = 'HTTPS/REST';
+  // data.url = `https://localhost:${serverPort}/temperature`
+
+  // rpc
+  data.accessMode = 'HTTPS/GRPC';
+  data.url = `localhost:${serverPort}`;
+
+  await contract.access_started(request.requestId, pubkey, JSON.stringify(data), argv.gas);
   winston.info('access started on contract!');
 
   // wait and then stop access

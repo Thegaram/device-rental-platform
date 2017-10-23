@@ -9,7 +9,14 @@ function timingSafeEqual(a, b, maxlength) {
   return crypto.timingSafeEqual(Buffer.from(a.padEnd(maxlength, '*')), Buffer.from(b.padEnd(maxlength, '*')));
 }
 
+function timeSecondsLater(numSeconds) {
+  const t = new Date();
+  t.setSeconds(t.getSeconds() + numSeconds);
+  return t;
+}
+
 module.exports = {
   sleep,
-  timingSafeEqual
+  timingSafeEqual,
+  timeSecondsLater
 };
