@@ -97,16 +97,16 @@ async function handleRequest(request) {
   };
 
   // ssh
-  // data.accessMode = 'SSH';
+  // data.accessMode = Utils.AccessMode.SSH;
   // data.host = 'localhost';
   // data.port = serverPort;
 
   // rest
-  // data.accessMode = 'HTTPS/REST';
+  // data.accessMode = Utils.AccessMode.REST;
   // data.url = `https://localhost:${serverPort}/temperature`
 
   // rpc
-  data.accessMode = 'HTTPS/GRPC';
+  data.accessMode = Utils.AccessMode.GRPC;
   data.url = `localhost:${serverPort}`;
 
   await contract.access_started(request.requestId, pubkey, JSON.stringify(data), argv.gas);

@@ -2,9 +2,9 @@ const winston = require('winston');
 const minimist = require('minimist');
 
 const Contract = require('./utils/contract.js');
-const ssh = require('./utils/ssh_client.js');
-// const client = require('./utils/rest_client');
-const client = require('./utils/rpc_client');
+const SSHClient = require('./utils/ssh_client.js');
+const RESTClient = require('./utils/rest_client');
+const RPCClient = require('./utils/rpc_client');
 const DH = require('./utils/dh.js');
 const Utils = require('./utils/utils.js');
 
@@ -61,18 +61,31 @@ const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a092
   // wait for approval
   const approval = await contract.waitForApproval();
   winston.info('access granted!');
+  winston.debug(approval);
 
   // establish secret
   const secret = dh.computeSecret(approval.pubkey);
   winston.info('established shared secret!');
   winston.debug(secret);
 
-  // connect through ssh
-  // winston.info('starting ssh session...');
-  // await ssh.shell(approval.data, secret);
-  // winston.info('ssh connection closed!');
+  if (approval.data.accessMode === Utils.AccessMode.SSH) {
 
-  winston.info('requesting resource...');
-  const response = await client.request(approval.data, certificate, secret);
-  winston.debug(response);
+    // connect through ssh
+    winston.info('starting ssh session...');
+    await SSHClient.shell(approval.data, secret);
+    winston.info('ssh connection closed!');
+  }
+  else if (approval.data.accessMode === Utils.AccessMode.REST) {
+    winston.info('requesting resource through https/rest...');
+    const response = await RESTClient.request(approval.data, certificate, secret);
+    winston.debug(response);
+  }
+  else if (approval.data.accessMode === Utils.AccessMode.GRPC) {
+    winston.info('requesting resource through https/grpc...');
+    const response = await RPCClient.request(approval.data, certificate, secret);
+    winston.debug(response);
+  }
+  else {
+    winston.error('unknown access mode!');
+  }
 })();

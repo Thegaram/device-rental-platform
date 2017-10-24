@@ -21,8 +21,15 @@ function timeSecondsLater(numSeconds) {
   return t;
 }
 
+const AccessMode = {
+  SSH: 'SSH',
+  REST: 'HTTPS/REST',
+  GRPC: 'HTTPS/GRPC'
+};
+
 module.exports = {
   sleep,
   timingSafeEqual,
-  timeSecondsLater
+  timeSecondsLater,
+  AccessMode
 };
