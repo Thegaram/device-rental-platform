@@ -1,0 +1,29 @@
+{
+  "description": "time-limited access to temperature readings",
+  "weiPerSecond": 1000,
+  "contractAddress": "0xb1df3bd91ab7ff0426943e46bdc9ef52c150b69e",
+
+  "type": "data",
+
+  "data": {
+    "format": "json",
+    "template": {
+      "requestor": "string",
+      "data": "float",
+      "requestTime": "date",
+      "readingTime": "date",
+      "format": "string"
+    }
+  },
+
+  "access": {
+    "method": "https/rest",
+    "auth": "https basic auth",
+    "parameters": {
+      "accessMode": "https/rest",
+      "url": "string",
+      "username": "string",
+      "accessEndTime": "date"
+    }
+  }
+}

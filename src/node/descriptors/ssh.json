@@ -1,0 +1,19 @@
+{
+  "description": "time-limited exclusive server access",
+  "weiPerSecond": 1000,
+  "contractAddress": "0xb1df3bd91ab7ff0426943e46bdc9ef52c150b69e",
+
+  "type": "access",
+
+  "access": {
+    "method": "ssh",
+    "auth": "ssh username-password",
+    "parameters": {
+      "accessMode": "ssh",
+      "host": "string",
+      "port": "int",
+      "username": "string",
+      "accessEndTime": "date"
+    }
+  }
+}

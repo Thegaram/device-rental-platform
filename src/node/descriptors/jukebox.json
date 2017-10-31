@@ -1,0 +1,21 @@
+{
+  "description": "play a song",
+  "weiPerSecond": 1000,
+  "contractAddress": "0xb1df3bd91ab7ff0426943e46bdc9ef52c150b69e",
+
+  "type": "action",
+
+  "access": {
+    "method": "https/grpc",
+    "auth": "https basic auth as metadata (username-password)",
+    "parameters": {
+      "accessMode": "https/grpc",
+      "url": "string",
+      "username": "string",
+      "accessEndTime": "date"
+    },
+    "requestParameters": {
+      "id": "string"
+    }
+  }
+}

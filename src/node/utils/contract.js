@@ -124,8 +124,9 @@ class Contract {
     return this.contract.methods.getAllowedExecutionTimeSeconds(requestId).call();
   }
 
-  weiPerSecond() {
-    return this.contract.methods.weiPerSecond().call();
+  async weiPerSecond() {
+    const weiPerSecondString = await this.contract.methods.weiPerSecond().call();
+    return parseInt(weiPerSecondString, 10);
   }
 
   certificate() {

@@ -89,7 +89,7 @@ Replace the placeholder `<<contract address>>` with the address you just noted d
 
 6. **run client program**
 ```
-blockchain_iot/src/node $ node client.js --contractaddr="<<contract address>>" --privkey="0649f1ba06eb15d5f293e8943a6cd3be6396ca981ea87412faa3e8cc8338dbc5" --confreq=4 --debug --accessTimeSeconds=5
+blockchain_iot/src/node $ node client.js --privkey="0649f1ba06eb15d5f293e8943a6cd3be6396ca981ea87412faa3e8cc8338dbc5" --confreq=4 --debug --accessTimeSeconds=5 --descriptorPath="<<descriptor path>>"
 ```
 
-Replace the placeholder `<<contract address>>` with the address you just noted down.
+Replace the placeholder `<<descriptor path>>` with the path to the device descriptor you'd like to use, e.g. `./descriptors/temperature.json`. (Note: the `weiPerSecond` and `contractAddress` fields in the descriptor must match those of your contract!)

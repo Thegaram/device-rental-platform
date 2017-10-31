@@ -22,9 +22,9 @@ function timeSecondsLater(numSeconds) {
 }
 
 const AccessMode = {
-  SSH: 'SSH',
-  REST: 'HTTPS/REST',
-  GRPC: 'HTTPS/GRPC'
+  SSH: 'ssh',
+  REST: 'https/rest',
+  GRPC: 'https/grpc'
 };
 
 module.exports = {

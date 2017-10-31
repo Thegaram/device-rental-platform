@@ -44,7 +44,6 @@ const prime = 'd3b228bb6c57848417e32609347205a17db75b02c8a3248b2e09ea84f0749a092
 winston.info('generating keys...');
 const dh = new DH(prime);
 const pubkey = dh.getPublicKey();
-winston.info('keys generated successfully!');
 
 async function checkCertificate() {
   const localCert = fs.readFileSync('sslcert/localhost.crt', 'utf8');
@@ -53,7 +52,6 @@ async function checkCertificate() {
   if (localCert !== contractCert) {
     winston.info('uploading certificate...');
     await contract.setCertificate(localCert, 100000000);
-    winston.info('certificate uploaded successfully!');
   }
 }
 
@@ -78,14 +76,13 @@ const service = new RPCServer(serverPort);
 
 async function handleRequest(request) {
   // establish secret
+  winston.info('establishing shared secret...');
   const secret = dh.computeSecret(request.pubkey);
-  winston.info('established shared secret!');
   winston.debug(secret);
 
   // start access on service
   winston.info('starting access on service...');
   await service.start_access(request.requestId, secret);
-  winston.info('access started on service!');
 
   // start access on contract
   winston.info(`starting access on contract for ${request.requestId}...`);
@@ -110,17 +107,14 @@ async function handleRequest(request) {
   data.url = `localhost:${serverPort}`;
 
   await contract.access_started(request.requestId, pubkey, JSON.stringify(data), argv.gas);
-  winston.info('access started on contract!');
 
   // wait and then stop access
   winston.info(`allowing access for ${keepAliveSeconds} seconds...`);
   await Utils.sleep(keepAliveSeconds * 1000);
   winston.info('stopping access on service...');
   await service.stop_access(request.requestId);
-  winston.info('access stopped on service!');
 
   // finish access on contract
   winston.info('finishing access on contract...');
   await contract.access_finished(request.requestId, argv.gas);
-  winston.info('access finished on contract!');
 };
