@@ -73,7 +73,7 @@ class Contract {
             // TODO: review this
             if (receipt.logs.length !== 0) {
               const decodedLogs = abiDecoder.decodeLogs(receipt.logs);
-              const requestId = this.web3.utils.hexToNumber(decodedLogs[0].events[0].value.replace('0x', ''));
+              const requestId = this.web3.utils.hexToNumber(decodedLogs[0].events[0].value);
               resolve(requestId);
             }
             else {
