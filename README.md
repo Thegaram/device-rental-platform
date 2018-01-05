@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the prototype implementation of the Device Rental Platform described in Péter Garamvölgyi's Bachelor's thesis *Blockchain-based access control of device access in cyber-physical systems* (Budapest University of Technology and Economics, Faculty of Electrical Engineering and Informatics, Department of Measurement and Information Systems, [Fault Tolerant Systems Research Group](https://inf.mit.bme.hu/en). Advisor: [Imre Kocsis](http://home.mit.bme.hu/~ikocsis).)
+This is the prototype implementation of the Device Rental Platform described in Péter Garamvölgyi's Bachelor's thesis *Blockchain-based access control of device access in cyber-physical systems* (Budapest University of Technology and Economics, Faculty of Electrical Engineering and Informatics, Department of Measurement and Information Systems, [Fault Tolerant Systems Research Group](https://inf.mit.bme.hu/en). Advisor: [Imre Kocsis](http://home.mit.bme.hu/~ikocsis).) The full thesis is available in this repository under the *documents* folder.
 
 The Device Rental Platform is a platform for selling time-limited, exlusive access to resources, with a special emphasis on CPS/IoT devices and the services they provide. The platform leverages Ethereum's smart contracts for access control and payments. This smart contract was designed using UML state diagrams. The smart contract also supports Diffie-Hellman key exchange over the blockchain. Simple device and client SDKs are also provided.
 
